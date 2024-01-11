@@ -15,7 +15,7 @@ function Earth() {
     if (mesh.current) {
       mesh.current.scale.set(1.5, 1.5, 1.5);
       mesh.current.position.setY(17.4); 
-      mesh.current.position.setX(0);
+      mesh.current.position.setX(0.5);
     }
   }, []);
 
