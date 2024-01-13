@@ -1,23 +1,43 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "@/app/ui/loader.module.css";
 import { lusitana } from "./ui/fonts";
 import { EarthMesh } from "./components/EarthMesh";
+import VideoPlayer from "./components/VideoPlayer";
 
 export default function Home() {
-  // State to manage loading completion
-  const [loadingComplete, setLoadingComplete] = useState(false);
-
-  // Function to handle loading completion
-  const handleLoadingComplete = () => {
-    setLoadingComplete(true);
+  const [progress, setProgress] = useState(1);
+  const [showPopup, setShowPopup] = useState(false);
+  const handleOpenPopup = () => {
+    setShowPopup(true);
   };
+
+  const handleClosePopup = () => {
+    console.log("Closing popup");
+    setProgress(0);
+    setShowPopup(false);
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress < 100 ? prevProgress + 1 : 100
+      );
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (progress === 100) {
+      handleOpenPopup();
+    }
+  }, [progress, handleOpenPopup]);
 
   return (
     <main className={`${styles.layout_main}`}>
       <div className={`${styles.section1}`}>
         <h1
-          className={`mb-4 text-center  text-6xl font-bold ${lusitana.className}`}
+          className={`mb-4 text-center text-6xl font-bold ${lusitana.className}`}
         >
           About MAURITIUS
         </h1>
@@ -41,7 +61,7 @@ export default function Home() {
         <div className={`relative mt-4 w-full ${styles.progress_container}`}>
           <progress
             className={`w-full ${styles.progress_bar}`}
-            value={loadingComplete ? "100" : "50"} // Update value based on loading completion
+            value={progress}
             max="100"
           ></progress>
           <span
@@ -58,16 +78,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Render the video popup when loading is complete */}
-      {loadingComplete && (
+      <div className={`${styles.videoPopup}`}>
         <div className={`${styles.videoPopup}`}>
-          {/* Add your video component or any content here */}
-          <video controls width="400">
-            <source src="your-video-source.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          <VideoPlayer
+            showPopup={showPopup}
+            handleClosePopup={handleClosePopup}
+          />
         </div>
-      )}
+      </div>
     </main>
   );
 }
